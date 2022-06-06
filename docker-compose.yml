@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+  eureka_app:
+    build: .
+    volumes:
+      - .:/django
+      - static:/static
+    depends_on:
+      - eureka_db
+    container_name: eureka_app
+
+  eureka_db:
+    image: postgres:14.3-alpine3.16
+    volumes:
+      - eureka_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    container_name: eureka_db
+
+  eureka_nginx:
+    build: ./nginx
+    container_name: eureka_nginx
+    volumes:
+      - static:/static
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - eureka_app
+
+volumes:
+  eureka_data:
+  static:
