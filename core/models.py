@@ -20,4 +20,5 @@ class Product(BaseModel):
     max_durability = models.PositiveIntegerField()
     mileage = models.PositiveIntegerField(null=True)
     price = models.DecimalField(max_digits=14, decimal_places=2)
+    discount_rate = models.DecimalField(max_digits=14, decimal_places=2, null=True)
     minimum_rent_period = models.PositiveIntegerField()
