@@ -11,7 +11,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
 class ProductListView(LoginRequiredMixin, ListView):
     template_name = 'product_list.html'
-    paginate_by = 5
+    paginate_by = 15
     model = Product
 
     def get_queryset(self):

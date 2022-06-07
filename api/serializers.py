@@ -11,7 +11,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'updated_at'
         ]
 
-    def to_representation(self, instance):
-        data = super(ProductSerializer, self).to_representation(instance)
-        data['type'] = instance.get_type_display()
-        return data
+    # def to_representation(self, instance):
+    #     data = super(ProductSerializer, self).to_representation(instance)
+    #     data['type'] = instance.get_type_display()
+    #     return data
