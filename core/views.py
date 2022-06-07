@@ -1,6 +1,6 @@
-from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView, ListView, CreateView
+from django.db.models.query import Q
 
 from core.models import Product
 
@@ -13,7 +13,12 @@ class ProductListView(LoginRequiredMixin, ListView):
     template_name = 'product_list.html'
     paginate_by = 5
     model = Product
-    
+
+    def get_queryset(self):
+        q = self.request.GET.get('q')
+        queryset = super(ProductListView, self).get_queryset()
+        return queryset.filter(Q(name__icontains=q) | Q(code__icontains=q)) if q else queryset
+
     def get_context_data(self, *args, **kwargs):
         data = super(ProductListView, self).get_context_data(*args, **kwargs)
         data['title'] = 'Products'
