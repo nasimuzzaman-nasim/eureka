@@ -1,0 +1,35 @@
+{% load paginate_tag %}
+ <div style="border-top: none" class="card-footer mt-0 mb-0 pt-0 pb-0">
+    <nav aria-label="Page navigation">
+        {% if page_obj.has_other_pages %}
+            <ul class="pagination justify-content-end pt-1">
+
+
+                {% if page_obj.has_previous %}
+                    <li class="page-item next"><a class="page-link" href="?{% url_replace request 'page' page_obj.previous_page_number %}"><i class="fa fa-step-backward"></i></a>
+                    </li>
+                {% else %}
+                    <li class="page-item prev disabled"><a class="page-link" href="javascript:void(0);"><i class="fa fa-step-backward"></i></a></li>
+                {% endif %}
+
+                {% for i in page_obj.paginator|proper_paginate:page_obj.number %}
+                    {% if page_obj.number == i %}
+                        <li class="page-item active"><a class="page-link" href="javascript:void(0);">{{ i }}</a></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="?{% url_replace request 'page' i %}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item next"><a class="page-link" href="?{% url_replace request 'page' page_obj.next_page_number %}"><i class="fa fa-step-forward"></i></a>
+                    </li>
+                {% else %}
+                    <li class="page-item next disabled"><a class="page-link" href="javascript:void(0);"><i class="fa fa-step-forward"></i></a></li>
+                {% endif %}
+
+
+
+            </ul>
+        {% endif %}
+    </nav>
+</div>

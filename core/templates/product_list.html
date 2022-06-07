@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load paginate_tag %}
+
+{% block css %}
+    <style>
+        .card .card-footer ul li {
+            padding: 0!important;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="content">
+        <div class="animated fadeIn">
+            <div class="row d-flex justify-content-center">
+                <div class="col-lg-10">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong class="card-title">Product List</strong>
+                        </div>
+                        <div class="table-stats order-table ov-h">
+                            <table class="table ">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Code</th>
+                                        <th>Availability</th>
+                                        <th>Need to Repair</th>
+                                        <th>Durability</th>
+                                        <th>Mileage</th>
+                                        <th>Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for product in object_list %}
+                                    <tr>
+
+                                        <td> {{ forloop.counter|add:base_count }} </td>
+                                        <td>  <span >{{ product.name }}</span> </td>
+                                        <td> <span >{{ product.code }}</span> </td>
+                                        <td><span >{{ product.availability }}</span></td>
+                                        <td><span >{{ product.needing_repair }}</span></td>
+                                        <td><span >{{ product.durability }}</span></td>
+                                        <td><span >{{ product.mileage }}</span></td>
+                                        <td><span >{{ product.discount_rate|default_if_none:product.price }}</span></td>
+                                    </tr>
+                                {% endfor %}
+
+                                </tbody>
+                            </table>
+                        </div> <!-- /.table-stats -->
+                    <!-- Pagination Start -->
+                       {% include 'extra/pagination.html' %}
+                        <!-- Pagination End -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

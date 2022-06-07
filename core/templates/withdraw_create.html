@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="content">
+        <div class="animated fadeIn">
+
+
+            <div class="row d-flex justify-content-center">
+                <div class="col-md-6 ">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong class="card-title">Withdraw</strong>
+                        </div>
+                        <div class="card-body">
+                            <!-- Credit Card -->
+                            <div id="pay-invoice">
+                                <div class="card-body">
+{#                                    <div class="card-title">#}
+{#                                        <h3 class="text-center">Withdraw Invoice</h3>#}
+{#                                    </div>#}
+                                    {% for message in messages %}
+                                    <div class="alert alert-danger" role="alert">
+                                      {{ message }}
+                                    </div>
+                                    {% endfor %}
+
+                                    <form action="{% url 'core:create_withdraw_url' %}" method="post" >
+                                        {% csrf_token %}
+
+                                        {{ form|crispy }}
+
+
+                                        <div>
+                                            <button id="payment-button" type="submit" class="btn btn-lg btn-info btn-block">
+                                                Send
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div> <!-- .card -->
+
+                </div><!--/.col-->
+            </div>
+        </div>
+    </div>
+{% endblock %}
