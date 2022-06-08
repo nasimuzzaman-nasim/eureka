@@ -39,11 +39,7 @@ class RentProductView(LoginRequiredMixin, View):
 class RentProductList(LoginRequiredMixin, ListView):
     template_name = 'rent_list.html'
     paginate_by = settings.PER_PAGE
-    model = Product
-
-    def get_queryset(self):
-        queryset = super(RentProductList, self).get_queryset().filter(rents__user=self.request.user)
-        return queryset
+    model = RentProduct
 
     def get_context_data(self, *args, **kwargs):
         data = super(RentProductList, self).get_context_data(*args, **kwargs)

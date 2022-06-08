@@ -12,5 +12,5 @@ urlpatterns = [
     path('create-multiple-product', CreateMultipleProduct.as_view(), name='create_multiple_product_api'),
     path('products', ProductList.as_view(), name='products_api'),
     path('calculate-estimated-rent', CalculateEstimatedRent.as_view(), name='calculate_estimated_rent_api'),
-    path('user-rent', UserRentProductList.as_view(), name='user_rent_api'),
+    path('user-rents', UserRentProductList.as_view(), name='user_rent_api'),
 ]
