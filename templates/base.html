@@ -83,9 +83,9 @@
             <div class="top-right">
                 <div class="header-menu">
                     <div class="header-left mt-3">
-{#                        onclick="common_func('#bookModal', '#productSelect', '{% url "api:products_api" %}')"#}
-                        <button class="btn btn-sm btn-outline-secondary shadow-3"  type="button" data-toggle="modal" data-target="#bookModal">Book</button>
-                        <button class="btn btn-sm btn-outline-secondary shadow-3" type="button" data-toggle="modal" data-target="#returnModal">Return</button>
+{#                        onclick="fill_select2('#bookModal', '#productSelect', '{% url "api:products_api" %}')"  data-toggle="modal" data-target="#bookModal"#}
+                        <button class="btn btn-sm btn-outline-secondary shadow-3"  type="button" onclick="fill_select2('#bookModal', '#productSelect', '{% url "api:products_api" %}'); jQuery('#bookModal').modal('show');">Book</button>
+                        <button class="btn btn-sm btn-outline-secondary shadow-3" type="button" onclick="fill_select2('#returnModal', '#returnProductSelect', '{% url "api:user_rent_api" %}'); jQuery('#returnModal').modal('show');">Return</button>
                     </div>
 
                     <div class="user-area dropdown float-right">
@@ -214,14 +214,14 @@
     <script src="{% static 'assets/js/main.js' %}"></script>
 
     <script>
-        jQuery(document).ready(function($) {
-            $('#productSelect').select2({
-                dropdownParent: $('#bookModal'),
+        function fill_select2(modalID, selectID, url) {
+            jQuery(selectID).select2( {
+                dropdownParent: jQuery(modalID),
                 ajax: {
-                    url: '{% url "api:products_api" %}',
+                    url: url,
                     dataType: 'json',
                     headers: {
-                        "Authorization":"Bearer " + "{{ access }}"
+                        "Authorization":"Bearer " + "{{ access }}" // trying to make it simple enough
                     },
                     delay: 250,
                     data: function (params) {
@@ -249,6 +249,10 @@
                 placeholder: 'Select a product',
                 allowClear: true,
             });
+        }
+
+        jQuery(document).ready(function($) {
+            {#$('#productSelect').select2();#}
 
 
             $('input[name="dates"]').daterangepicker({

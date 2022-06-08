@@ -1,7 +1,8 @@
 from rest_framework.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView
 from api.views import (CreateMultipleProduct, CreateSingleProduct,
-                       ProductList, CalculateEstimatedRent)
+                       ProductList, CalculateEstimatedRent,
+                       UserRentProductList)
 
 app_name = 'api'
 
@@ -11,4 +12,5 @@ urlpatterns = [
     path('create-multiple-product', CreateMultipleProduct.as_view(), name='create_multiple_product_api'),
     path('products', ProductList.as_view(), name='products_api'),
     path('calculate-estimated-rent', CalculateEstimatedRent.as_view(), name='calculate_estimated_rent_api'),
+    path('user-rent', UserRentProductList.as_view(), name='user_rent_api'),
 ]
