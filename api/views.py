@@ -27,6 +27,7 @@ class CreateMultipleProduct(CreateSingleProduct):
 
 
 class ProductList(ListAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = MinProductSerializer
     queryset = Product.objects.filter(availability=True, needing_repair=False)
 
@@ -37,6 +38,7 @@ class ProductList(ListAPIView):
 
 
 class CalculateEstimatedRent(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         data = request.data
         product_id = data.get('product_id')
@@ -49,3 +51,12 @@ class CalculateEstimatedRent(APIView):
         start, end = split_date(date_range)
         stat, detail = product.calculate_estimated_rent((end-start).days+1)
         return Response({'status': stat, 'detail': detail}, status=status.HTTP_200_OK)
+
+
+class UserRentProductList(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = MinProductSerializer
+
+    def get_queryset(self):
+        queryset = super(UserRentProductList, self).get_queryset()
+        return queryset.filter(rents__user=self.request.user)

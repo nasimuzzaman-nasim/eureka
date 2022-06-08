@@ -197,8 +197,11 @@
             $('.select2').select2({
                 dropdownParent: $('#bookModal'),
                 ajax: {
-                    url: '/api/products',
+                    url: '{% url "api:products_api" %}',
                     dataType: 'json',
+                    headers: {
+                        "Authorization":"Bearer " + "{{ access }}"
+                    },
                     delay: 250,
                     data: function (params) {
                       return {
@@ -210,14 +213,13 @@
                     },
                     processResults: function (data, params) {
                         params.page = params.page || 1;
-                        console.log(data)
 
                         return {
                             results: data.results.map((item)=> {
                                 return {'id': item.id, text: item.code + '-' + item.name}
                             }),
                             pagination: {
-                              more: (params.page * 15) < data.count
+                              more: (params.page * {{ per_page }}) < data.count
                             }
                         };
                     },
@@ -243,22 +245,32 @@
                 date_range: date.val(),
             }
 
-            jQuery.post('/api/calculate-estimated-rent', payload, (data) => {
-                if (data.status) {
-                    if (confirm('Your estimated price is $'+ data.detail +'. \nDo you want to procedure?')) {
-                        payload['csrfmiddlewaretoken'] = '{{ csrf_token }}'
-                        jQuery.post('{% url "core:rent_product_url" %}', payload, (data) => {
-                            if (data.status){
-                                location.reload()
-                            } else{
-                                alert('Something went wrong!')
-                            }
-                        })
+            jQuery.ajax({
+                url: '{% url "api:calculate_estimated_rent_api" %}',
+                type: 'post',
+                data: payload,
+                headers: {
+                    "Authorization":"Bearer " + "{{ access }}"
+                },
+                success: (data) => {
+                    if (data.status) {
+                        if (confirm('Your estimated price is $'+ data.detail +'. \nDo you want to procedure?')) {
+                            payload['csrfmiddlewaretoken'] = '{{ csrf_token }}'
+                            jQuery.post('{% url "core:rent_product_url" %}', payload, (data) => {
+                                if (data.status){
+                                    location.replace('{% url "core:rents_url" %}')
+                                } else{
+                                    alert('Something went wrong!')
+                                }
+                            })
+                        }
+                    } else {
+                        alert(data.detail)
                     }
-                } else {
-                    alert(data.detail)
+
                 }
             })
+
         }
 
     </script>
