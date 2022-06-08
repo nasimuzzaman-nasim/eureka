@@ -50,7 +50,7 @@ class Product(BaseModel):
     minimum_rent_period = models.PositiveIntegerField()
 
     objects = models.Manager()
-    available_for_rent = AvailableProductManager()
+    available_for_rents = AvailableProductManager()
 
     def __str__(self):
         return '%s - %s' % (self.code, self.name)
@@ -102,7 +102,7 @@ class RentProduct(BaseModel):
         date_range = data.get('date_range')
         start, end = make_date(date_range)
         try:
-            product = Product.available_for_rent.get(id=product_id)
+            product = Product.available_for_rents.get(id=product_id)
         except Product.DoesNotExist:
             raise Http404
 
@@ -118,5 +118,47 @@ class RentProduct(BaseModel):
             rent_end=end
         )
         rent.save()
+        product.availability = False
+        product.save(update_fields=['availability'])
         return True, rent
 
+    @staticmethod
+    def calculate_rent(request, api=False):
+        data = request.POST if not api else request.data
+        product_id = data.get('product_id')
+        needing_repair = data.get('needing_repair')
+        product = Product.objects.get(id=product_id)
+        today = date.today()
+
+        rent_obj = RentProduct.objects.get(user=request.user, return_date__isnull=True, product=product)
+        rent_period = (today - rent_obj.rent_start).days + 1
+        penalty = False
+
+        cost = product.current_price * rent_period
+        if today > rent_obj.rent_end:
+            penalty = True
+
+        d_loss = rent_period * 2 if product.type == METER else rent_period
+        if d_loss + product.durability > product.max_durability:
+            penalty = True
+
+        mileage = rent_period * 10 if product.type == METER else None
+        if product.type == METER and not product.mileage > mileage :
+            penalty = True
+
+        if product.minimum_rent_period > rent_period:
+            penalty = True
+
+        if needing_repair:
+            penalty = True
+
+        return {
+            'product': product,
+            'rent_obj': rent_obj,
+            'cost': cost,
+            'durability_add': d_loss,
+            'mileage_loss': mileage,
+            'needing_repair': True if needing_repair else False,
+            'penalty': 100 if penalty else 0,
+            'return_date': today
+        }

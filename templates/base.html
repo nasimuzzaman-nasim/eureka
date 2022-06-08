@@ -153,7 +153,7 @@
                 <h5 class="modal-title" id="returnModalLabel">Return a product</h5>
 
               </div>
-              <form method="post" id="returnForm" onsubmit="calculate_estimated_rent(event)">
+              <form method="post" id="returnForm" onsubmit="calculate_rent(event)">
                     {% csrf_token %}
                   <div class="modal-body container-fluid">
 
@@ -165,8 +165,8 @@
                         </select>
                       </div>
                       <div class="form-check">
-                      <input class="form-check-input" name="needing_repair" type="checkbox" value="" id="flexCheckDefault">
-                      <label class="form-check-label" for="flexCheckDefault">
+                      <input class="form-check-input" name="needing_repair" type="checkbox" value="" id="repair">
+                      <label class="form-check-label" for="repair">
                         Need to repair
                       </label>
                     </div>
@@ -281,9 +281,52 @@
                 },
                 success: (data) => {
                     if (data.status) {
-                        if (confirm('Your estimated price is $'+ data.detail +'. \nDo you want to procedure?')) {
+                        if (confirm('Your estimated price is $'+ data.detail +'. \nDo you want to proceed?')) {
                             payload['csrfmiddlewaretoken'] = '{{ csrf_token }}'
                             jQuery.post('{% url "core:rent_product_url" %}', payload, (data) => {
+                                if (data.status){
+                                    location.replace('{% url "core:rents_url" %}')
+                                } else{
+                                    alert('Something went wrong!')
+                                }
+                            })
+                        }
+                    } else {
+                        alert(data.detail)
+                    }
+
+                }
+            })
+
+        }
+
+
+        function calculate_rent(e) {
+            e.preventDefault();
+            const product = jQuery('#returnProductSelect')
+            const repair = jQuery('#repair')
+            var repair_val = ''
+            if (jQuery(repair).is(":checked")){
+                  repair_val = 'on'
+            }
+            let payload = {
+                product_id: product.val(),
+                needing_repair: repair_val
+            }
+
+            jQuery.ajax({
+                url: '{% url "api:calculate_rent_api" %}',
+                type: 'post',
+                data: payload,
+                headers: {
+                    "Authorization":"Bearer " + "{{ access }}"
+                },
+                success: (data) => {
+                    if (data.status) {
+                        if (confirm(data.message)) {
+                            payload['csrfmiddlewaretoken'] = '{{ csrf_token }}'
+                            //
+                            jQuery.post('{% url "core:return_product_url" %}', payload, (data) => {
                                 if (data.status){
                                     location.replace('{% url "core:rents_url" %}')
                                 } else{

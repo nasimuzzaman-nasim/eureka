@@ -6,6 +6,7 @@ from django.db.models.query import Q
 from django.conf import settings
 
 from core.models import Product, RentProduct
+from eureka.utils import return_book_operation
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -34,6 +35,13 @@ class RentProductView(LoginRequiredMixin, View):
     def post(self, request):
         status, obj = RentProduct.create_rent(request)
         return JsonResponse({'status': status, 'detail': None if status else obj}, safe=False)
+
+
+class ReturnProductView(LoginRequiredMixin, View):
+    def post(self, request):
+        data = RentProduct.calculate_rent(request)
+        return_book_operation(data)
+        return JsonResponse({'status': True}, status=200)
 
 
 class RentProductList(LoginRequiredMixin, ListView):

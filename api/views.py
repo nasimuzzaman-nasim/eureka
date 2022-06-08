@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.db.models.query import Q
 
-from core.models import Product
+from core.models import Product, RentProduct
 from api.serializers import ProductSerializer, MinProductSerializer
 from eureka.utils import make_date
 
@@ -32,7 +32,7 @@ class ProductList(ListAPIView):
 
     def get_queryset(self):
         q = self.request.GET.get('q')
-        queryset = Product.available_for_rent.filter(Q(name__icontains=q) | Q(code__icontains=q)) if q else Product.available_for_rent.all()
+        queryset = Product.available_for_rents.filter(Q(name__icontains=q) | Q(code__icontains=q)) if q else Product.available_for_rents.all()
         return queryset
 
 
@@ -44,7 +44,7 @@ class CalculateEstimatedRent(APIView):
         product_id = data.get('product_id')
         date_range = data.get('date_range')
         try:
-            product = Product.available_for_rent.get(id=product_id)
+            product = Product.available_for_rents.get(id=product_id)
         except Product.DoesNotExist:
             return Response({'status': False, 'detail': 'Product not found!'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -53,10 +53,19 @@ class CalculateEstimatedRent(APIView):
         return Response({'status': stat, 'detail': detail}, status=status.HTTP_200_OK)
 
 
+class CalculateRentCost(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = RentProduct.calculate_rent(request, api=True)
+        message = 'Your rent fee: $%s. TOS violation fee: $%s. Total: $%s \nDo you want to proceed?' % (data['cost'], data['penalty'], data['penalty']+data['cost'])
+        return Response({'status': True, 'cost': data['cost'], 'penalty': data['penalty'],
+                         'message': message}, status=status.HTTP_200_OK)
+
+
 class UserRentProductList(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = MinProductSerializer
 
     def get_queryset(self):
-        queryset = super(UserRentProductList, self).get_queryset()
-        return queryset.filter(rents__user=self.request.user)
+        return Product.objects.filter(rents__user=self.request.user, rents__return_date__isnull=True)
