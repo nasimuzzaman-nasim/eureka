@@ -90,6 +90,7 @@ class RentProduct(BaseModel):
 
     return_date = models.DateField(null=True)
     actual_cost = models.DecimalField(max_digits=14, decimal_places=2, null=True)
+    penalty = models.DecimalField(max_digits=14, decimal_places=2, null=True)
 
     def __str__(self):
         return '%s -> %s' % (self.user.username, self.product)

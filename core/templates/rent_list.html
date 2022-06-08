@@ -35,14 +35,14 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Created</th>
                                         <th>Username</th>
                                         <th>Product</th>
                                         <th>Rent Start</th>
                                         <th>Rent End</th>
                                         <th>Return</th>
                                         <th>Estimated Cost</th>
-                                        <th>Actual Cost</th>
+                                        <th>Rent Cost</th>
+                                        <th>Penalty</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -50,7 +50,6 @@
                                     <tr>
 
                                         <td> {{ forloop.counter|add:base_count }} </td>
-                                        <td> {{ rent.created_at|date }} </td>
                                         <td>  <span >{{ rent.user.username }}</span> </td>
                                         <td> <span >{{ rent.product.full_name }}</span> </td>
                                         <td><span >{{ rent.rent_start }}</span></td>
@@ -58,6 +57,7 @@
                                         <td><span >{{ rent.return_date|default_if_none:'-' }}</span></td>
                                         <td><span >${{ rent.estimated_cost }}</span></td>
                                         <td><span >{% if rent.actual_cost %}${% endif %}{{ rent.actual_cost|default_if_none:'-' }}</span></td>
+                                        <td><span >{% if rent.penalty %}${% endif %}{{ rent.penalty|default_if_none:'-' }}</span></td>
                                     </tr>
                                 {% endfor %}
 
