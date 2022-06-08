@@ -146,7 +146,7 @@ class RentProduct(BaseModel):
         if product.type == METER and not product.mileage > mileage :
             penalty = True
 
-        if product.minimum_rent_period > rent_period:
+        if product.minimum_rent_period > rent_period > (rent_obj.rent_end - rent_obj.rent_start).days+1:
             penalty = True
 
         if needing_repair:

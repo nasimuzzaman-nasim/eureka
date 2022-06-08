@@ -12,6 +12,16 @@ from eureka.utils import return_book_operation
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard.html'
 
+    def get_context_data(self, **kwargs):
+        data = super(DashboardView, self).get_context_data(**kwargs)
+        data['title'] = 'Dashboard'
+        data['total'] = Product.objects.count()
+        data['available'] = Product.available_for_rents.count()
+        data['rent'] = RentProduct.objects.filter(return_date__isnull=True).count()
+        data['repair'] = Product.objects.filter(needing_repair=True).count()
+
+        return data
+
 
 class ProductListView(LoginRequiredMixin, ListView):
     template_name = 'product_list.html'
