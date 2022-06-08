@@ -1,8 +1,7 @@
-from datetime import datetime
+from datetime import datetime, date
 
 
-def split_date(date_range_str):
-    start_str, end_str = date_range_str.split(' - ')
-    start = datetime.strptime(start_str, '%m/%d/%Y')
-    end = datetime.strptime(end_str, '%m/%d/%Y')
+def make_date(date_range_str):
+    start = date.today()
+    end = datetime.strptime(date_range_str, '%m/%d/%Y').date()
     return start, end

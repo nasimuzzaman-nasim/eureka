@@ -1,8 +1,12 @@
 from django.db import models
 from django.http import Http404
 from django.contrib.auth.models import User
+from django.db.models import F
+from django.db.models import Case, Q, When
+from datetime import date
+
 from eureka.g_model import BaseModel
-from eureka.utils import split_date
+from eureka.utils import make_date
 
 PLAIN = 'plain'
 METER = 'meter'
@@ -11,6 +15,25 @@ TypeChoice = (
     (PLAIN, 'plain'),
     (METER, 'meter')
 )
+
+
+class AvailableProductManager(models.Manager):
+    def get_queryset(self):
+        """
+            # durability should be less than max durability of that product
+            # 10 miles will be taken every day.
+            # mileage should be >=  minimum_rent_period * 10
+        :return: a queryset of available product to rent
+        """
+
+        query = {
+            'availability': True,
+            'needing_repair': False,
+            'durability__lt': F('max_durability'),
+
+        }
+        return super().get_queryset().filter(**query)\
+            .filter(Q(mileage__gte=Case(When(type=METER, then=F('minimum_rent_period')*10))) | Q(mileage__isnull=True))
 
 
 class Product(BaseModel):
@@ -26,6 +49,9 @@ class Product(BaseModel):
     discount_rate = models.DecimalField(max_digits=14, decimal_places=2, null=True)
     minimum_rent_period = models.PositiveIntegerField()
 
+    objects = models.Manager()
+    available_for_rent = AvailableProductManager()
+
     def __str__(self):
         return '%s - %s' % (self.code, self.name)
 
@@ -38,11 +64,20 @@ class Product(BaseModel):
         return self.discount_rate if self.discount_rate else self.price
 
     def calculate_estimated_rent(self, rent_period):
-        if self.minimum_rent_period <= rent_period:
-            estimated_fee = rent_period * self.current_price
-            return True, estimated_fee
+        d_loss = rent_period * 2 if self.type == METER else rent_period
+
+        # 10 miles will be taken every day.
+        if self.type == PLAIN or self.mileage - rent_period * 10:
+            if self.durability + d_loss < self.max_durability:
+                if self.minimum_rent_period <= rent_period:
+                    estimated_fee = rent_period * self.current_price
+                    return True, estimated_fee
+                else:
+                    return False, 'Minimum rent period is %s days!' % self.minimum_rent_period
+            else:
+                return False, 'Max durability exceed!'
         else:
-            return False, 'Minimum rent period is %s days' % self.minimum_rent_period
+            return False, 'Mileage error!'
 
 
 class RentProduct(BaseModel):
@@ -64,9 +99,9 @@ class RentProduct(BaseModel):
         data = request.POST
         product_id = data.get('product_id')
         date_range = data.get('date_range')
-        start, end = split_date(date_range)
+        start, end = make_date(date_range)
         try:
-            product = Product.objects.get(id=product_id)
+            product = Product.available_for_rent.get(id=product_id)
         except Product.DoesNotExist:
             raise Http404
 

@@ -7,7 +7,7 @@ from django.db.models.query import Q
 
 from core.models import Product
 from api.serializers import ProductSerializer, MinProductSerializer
-from eureka.utils import split_date
+from eureka.utils import make_date
 
 
 class CreateSingleProduct(CreateAPIView):
@@ -29,26 +29,26 @@ class CreateMultipleProduct(CreateSingleProduct):
 class ProductList(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = MinProductSerializer
-    queryset = Product.objects.filter(availability=True, needing_repair=False)
 
     def get_queryset(self):
         q = self.request.GET.get('q')
-        queryset = super(ProductList, self).get_queryset().filter(availability=True, needing_repair=False)
-        return queryset.filter(Q(name__icontains=q) | Q(code__icontains=q)) if q else queryset
+        queryset = Product.available_for_rent.filter(Q(name__icontains=q) | Q(code__icontains=q)) if q else Product.available_for_rent.all()
+        return queryset
 
 
 class CalculateEstimatedRent(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self, request):
         data = request.data
         product_id = data.get('product_id')
         date_range = data.get('date_range')
         try:
-            product = Product.objects.get(id=product_id)
+            product = Product.available_for_rent.get(id=product_id)
         except Product.DoesNotExist:
             return Response({'status': False, 'detail': 'Product not found!'}, status=status.HTTP_404_NOT_FOUND)
 
-        start, end = split_date(date_range)
+        start, end = make_date(date_range)
         stat, detail = product.calculate_estimated_rent((end-start).days+1)
         return Response({'status': stat, 'detail': detail}, status=status.HTTP_200_OK)
 
