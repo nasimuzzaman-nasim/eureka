@@ -30,6 +30,10 @@ class Product(BaseModel):
         return '%s - %s' % (self.code, self.name)
 
     @property
+    def full_name(self):
+        return '%s - %s' % (self.code, self.name)
+
+    @property
     def current_price(self):
         return self.discount_rate if self.discount_rate else self.price
 

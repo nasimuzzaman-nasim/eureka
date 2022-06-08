@@ -59,6 +59,9 @@
                     <li class="{% if request.resolver_match.url_name == 'product_list_url' %} active {% endif %}">
                         <a href="{% url 'core:product_list_url' %}"><i class="menu-icon fa fa-align-justify"></i>Products </a>
                     </li>
+                    <li class="{% if request.resolver_match.url_name == 'rents_url' %} active {% endif %}">
+                        <a href="{% url 'core:rents_url' %}"><i class="menu-icon fa fa-align-justify"></i>Rents </a>
+                    </li>
 
 
                 </ul>

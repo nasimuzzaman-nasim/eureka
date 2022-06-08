@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.views.generic import TemplateView, ListView, CreateView
 from django.views import View
 from django.db.models.query import Q
+from django.conf import settings
 
 from core.models import Product, RentProduct
 
@@ -13,7 +14,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
 class ProductListView(LoginRequiredMixin, ListView):
     template_name = 'product_list.html'
-    paginate_by = 15
+    paginate_by = settings.PER_PAGE
     model = Product
 
     def get_queryset(self):
@@ -33,3 +34,16 @@ class RentProductView(LoginRequiredMixin, View):
     def post(self, request):
         status, obj = RentProduct.create_rent(request)
         return JsonResponse({'status': status, 'detail': None if status else obj}, safe=False)
+
+
+class RentProductList(LoginRequiredMixin, ListView):
+    template_name = 'rent_list.html'
+    paginate_by = settings.PER_PAGE
+    model = RentProduct
+
+    def get_context_data(self, *args, **kwargs):
+        data = super(RentProductList, self).get_context_data(*args, **kwargs)
+        data['title'] = 'Rent'
+        data['base_count'] = (int(self.request.GET.get('page', 1)) - 1) * self.paginate_by
+
+        return data

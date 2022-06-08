@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load paginate_tag %}
+
+{% block css %}
+    <style>
+        .card .card-footer ul li {
+            padding: 0!important;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="content">
+        <div class="animated fadeIn">
+            <div class="row d-flex justify-content-center">
+                <div class="col-lg-10">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong class="card-title">Rent List</strong>
+{#                            <a class="btn btn-sm btn-outline-success ml-3" >#}
+{#                                Add product</a>#}
+{#                            <form class="float-right" method="get">#}
+{#                                <div class="form-inline">#}
+{#                                    <input class="form-control form-control-sm" name="q" value="{{ request.GET.q }}">#}
+{#                                    <button class="btn btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>#}
+{#                                </div>#}
+{#                            </form>#}
+
+                        </div>
+
+
+                        <div class="table-stats order-table ov-h">
+                            <table class="table ">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Created</th>
+                                        <th>Username</th>
+                                        <th>Product</th>
+                                        <th>Rent Start</th>
+                                        <th>Rent End</th>
+                                        <th>Return</th>
+                                        <th>Estimated Cost</th>
+                                        <th>Actual Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for rent in object_list %}
+                                    <tr>
+
+                                        <td> {{ forloop.counter|add:base_count }} </td>
+                                        <td> {{ rent.created_at|date }} </td>
+                                        <td>  <span >{{ rent.user.username }}</span> </td>
+                                        <td> <span >{{ rent.product.full_name }}</span> </td>
+                                        <td><span >{{ rent.rent_start }}</span></td>
+                                        <td><span >{{ rent.rent_end }}</span></td>
+                                        <td><span >{{ rent.return_date|default_if_none:'-' }}</span></td>
+                                        <td><span >${{ rent.estimated_cost }}</span></td>
+                                        <td><span >{% if rent.actual_cost %}${% endif %}{{ rent.actual_cost|default_if_none:'-' }}</span></td>
+                                    </tr>
+                                {% endfor %}
+
+                                </tbody>
+                            </table>
+                        </div> <!-- /.table-stats -->
+                    <!-- Pagination Start -->
+                       {% include 'extra/pagination.html' %}
+                        <!-- Pagination End -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
