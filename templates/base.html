@@ -112,7 +112,7 @@
                 <h5 class="modal-title" id="bookModalLabel">Book a product</h5>
 
               </div>
-                <form method="post">
+                <form method="post" id="bookForm" onsubmit="calculate_rent(event)">
                     {% csrf_token %}
                   <div class="modal-body container-fluid">
 
@@ -126,13 +126,16 @@
 
                       <div class="form-group">
                         <label for="exampleFormControlTextarea1">Date Range</label>
-                        <input type="text" name="dates" class="form-control" required>
+                        <input type="text" name="dates" class="form-control" id="dateRange" required>
                       </div>
 
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-sm btn-primary">Calculate</button>
+                    <button type="submit"  class="btn btn-sm btn-primary" id="bookSubmitBtn">
+                        Calculate
+                    </button>
+
                   </div>
                     </form>
             </div>
@@ -186,13 +189,12 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <script src="{% static 'assets/js/main.js' %}"></script>
 
-
     <script>
         jQuery(document).ready(function($) {
             $('.select2').select2({
                 dropdownParent: $('#bookModal'),
                 ajax: {
-                    url: 'http://127.0.0.1/api/products',
+                    url: '/api/products',
                     dataType: 'json',
                     delay: 250,
                     data: function (params) {
@@ -222,8 +224,39 @@
                 allowClear: true,
             });
 
-            $('input[name="dates"]').daterangepicker();
+            $('input[name="dates"]').daterangepicker({
+                minDate:new Date(),
+            });
         })
+
+
+        function calculate_rent(e) {
+            e.preventDefault();
+            const product = jQuery('#productSelect')
+            const date = jQuery('#dateRange')
+            const bookForm = jQuery('#bookForm')
+            let payload = {
+                product_id: product.val(),
+                date_range: date.val(),
+            }
+
+            jQuery.post('/api/calculate-estimated-rent', payload, (data) => {
+                if (data.status) {
+                    if (confirm('Your estimated price is $'+ data.detail +'. \nDo you want to procedure?')) {
+                        payload['csrfmiddlewaretoken'] = '{{ csrf_token }}'
+                        jQuery.post('{% url "core:rent_product_url" %}', payload, (data) => {
+                            if (data.status){
+                                location.reload()
+                            } else{
+                                alert('Something went wrong!')
+                            }
+                        })
+                    }
+                } else {
+                    alert(data.detail)
+                }
+            })
+        }
 
     </script>
 

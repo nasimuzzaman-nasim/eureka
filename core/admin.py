@@ -1,3 +1,7 @@
 from django.contrib import admin
+from core.models import Product, RentProduct
 
-# Register your models here.
+
+admin.site.register(Product)
+admin.site.register(RentProduct)
+

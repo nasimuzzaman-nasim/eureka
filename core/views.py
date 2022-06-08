@@ -1,8 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
 from django.views.generic import TemplateView, ListView, CreateView
+from django.views import View
 from django.db.models.query import Q
 
-from core.models import Product
+from core.models import Product, RentProduct
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -25,4 +27,9 @@ class ProductListView(LoginRequiredMixin, ListView):
         data['base_count'] = (int(self.request.GET.get('page', 1)) - 1) * self.paginate_by
 
         return data
-        
+
+
+class RentProductView(LoginRequiredMixin, View):
+    def post(self, request):
+        status, obj = RentProduct.create_rent(request)
+        return JsonResponse({'status': status, 'detail': None if status else obj}, safe=False)

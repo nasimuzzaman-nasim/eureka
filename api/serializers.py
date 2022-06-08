@@ -15,3 +15,13 @@ class ProductSerializer(serializers.ModelSerializer):
     #     data = super(ProductSerializer, self).to_representation(instance)
     #     data['type'] = instance.get_type_display()
     #     return data
+
+
+class MinProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = [
+            'id',
+            'code',
+            'name',
+        ]

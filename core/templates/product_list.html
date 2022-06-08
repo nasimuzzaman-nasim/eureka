@@ -41,6 +41,7 @@
                                         <th>Need to Repair</th>
                                         <th>Durability</th>
                                         <th>Mileage</th>
+                                        <th>Min Rent Period</th>
                                         <th>Price</th>
                                     </tr>
                                 </thead>
@@ -55,7 +56,8 @@
                                         <td><span >{{ product.needing_repair }}</span></td>
                                         <td><span >{{ product.durability }}</span></td>
                                         <td><span >{{ product.mileage }}</span></td>
-                                        <td><span >{{ product.discount_rate|default_if_none:product.price }}</span></td>
+                                        <td><span >{{ product.minimum_rent_period }} days</span></td>
+                                        <td><span >{{ product.current_price }}</span></td>
                                     </tr>
                                 {% endfor %}
 
