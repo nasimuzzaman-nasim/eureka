@@ -190,10 +190,21 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = '/static/'
+if not LOCAL:
+    AWS_DEFAULT_ACL = 'public-read'
+    AWS_QUERYSTRING_AUTH = False
+    AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = 'decorisdiamonds'
+    AWS_LOCATION = 'static'
+    AWS_S3_ENDPOINT_URL = config('AWS_S3_ENDPOINT_URL')
+    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400', }
+    DEFAULT_FILE_STORAGE = 'decoris.storage_backends.MediaStorage'
+    STATICFILES_STORAGE = 'decoris.storage_backends.StaticStorage'
 STATICFILES_DIRS = [
     BASE_DIR / "static_local",
 ]
-STATIC_ROOT = '/static/'
+STATIC_ROOT = BASE_DIR / 'static/'
 
 
 # Default primary key field type
