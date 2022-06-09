@@ -4,7 +4,6 @@ services:
     build: .
     volumes:
       - .:/django
-      - static:/static
     depends_on:
       - eureka_db
     restart: unless-stopped
@@ -25,8 +24,6 @@ services:
   eureka_nginx:
     build: ./nginx
     container_name: eureka_nginx
-    volumes:
-      - static:/static
     ports:
       - 80:80
       - 443:443
@@ -35,4 +32,3 @@ services:
 
 volumes:
   eureka_data:
-  static:
