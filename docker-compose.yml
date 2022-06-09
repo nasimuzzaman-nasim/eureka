@@ -1,13 +1,15 @@
-version: "3.8"
+version: "3.3"
 services:
   eureka_app:
     build: .
     volumes:
       - .:/django
+    deploy:
+      replicas: 3
     depends_on:
       - eureka_db
     restart: unless-stopped
-    container_name: eureka_app
+#    container_name: eureka_app
 
   eureka_db:
     image: postgres:14.3-alpine3.16
